@@ -9,11 +9,12 @@ import Separator from "../components/Auth/Separator.js";
 import Input from "../components/Auth/Input.js";
 import FormBox from "../components/Auth/FormBox.js";
 import BottomBox from "../components/Auth/BottomBox.js";
-import { Helmet } from "react-helmet-async";
 import { useForm } from "react-hook-form";
 import FormError from "../components/Auth/FormError.js";
 import { gql, useMutation } from "@apollo/client";
 import { logUserIn } from "../apollo.js";
+import { useLocation } from "react-router-dom";
+import PageTitle from "../components/PageTitle.js";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -21,6 +22,16 @@ const FacebookLogin = styled.div`
     margin-left: 10px;
     font-weight: 600;
   }
+`;
+const Notification = styled.div`
+  color: #ffffff;
+  background-color: #2ecc71;
+  text-align: center;
+  font-size: 16px;
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.35);
+  margin-top: 10px;
 `;
 
 const LOGIN_MUTATION = gql`
@@ -34,6 +45,8 @@ const LOGIN_MUTATION = gql`
 `;
 
 export default function Login() {
+  const location = useLocation();
+  console.log(location);
   const {
     register,
     handleSubmit,
@@ -44,6 +57,10 @@ export default function Login() {
     clearErrors,
   } = useForm({
     mode: "onChange",
+    defaultValues: {
+      username: location?.state?.username || "",
+      password: location?.state?.password || "",
+    },
   });
   const onCompleted = (data) => {
     const {
@@ -63,6 +80,7 @@ export default function Login() {
     if (loading) {
       return;
     }
+
     const { username, password } = getValues();
     login({
       variables: { username, password },
@@ -73,11 +91,16 @@ export default function Login() {
   };
   return (
     <AuthLayout>
-      <Helmet>
-        <title>Login | Social-Seed</title>
-      </Helmet>
+      <PageTitle title={"Login"} />
       <FormBox>
         <div>LOGO</div>
+
+        {location?.state?.message ? (
+          <Notification>{location?.state?.message}</Notification>
+        ) : (
+          ""
+        )}
+
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <Input
             ref={register({
