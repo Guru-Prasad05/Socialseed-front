@@ -72,7 +72,16 @@ const TOGGLE_LIKE_MUTATION = gql`
   }
 `;
 
-function Photo({ id, user, file, isLiked, likes, commentNumber, comments,caption }) {
+function Photo({
+  id,
+  user,
+  file,
+  isLiked,
+  likes,
+  commentNumber,
+  comments,
+  caption,
+}) {
   const updateToggleLike = (cache, result) => {
     const {
       data: {
@@ -81,31 +90,24 @@ function Photo({ id, user, file, isLiked, likes, commentNumber, comments,caption
     } = result;
     if (ok) {
       const fragmentId = `Photo:${id}`;
-      const fragment = gql`
-        fragment BSName on Photo {
-          isLiked
-          likes
-        }
-      `;
-      const cacheResult = cache.readFragment({
+      cache.modify({
         id: fragmentId,
-        fragment,
-      });
-      if ("isLiked" in cacheResult && "likes" in cacheResult) {
-        const { isLiked: cacheIsLiked, likes: cacheLikes } = cacheResult;
-        cache.writeFragment({
-          id: fragmentId,
-          fragment,
-          data: {
-            isLiked: !cacheIsLiked,
-            likes: cacheIsLiked ? cacheLikes - 1 : cacheLikes + 1,
+        fields: {
+          isLiked(prev) {
+            return !prev;
           },
-        });
-      }
+          likes(prev) {
+            if (isLiked) {
+              return prev - 1;
+            }
+            return prev + 1;
+          },
+        },
+      });
     }
   };
 
-  const [toggleLikeMutation, { loading }] = useMutation(TOGGLE_LIKE_MUTATION, {
+  const [toggleLikeMutation] = useMutation(TOGGLE_LIKE_MUTATION, {
     variables: {
       id,
     },
@@ -140,6 +142,7 @@ function Photo({ id, user, file, isLiked, likes, commentNumber, comments,caption
         </PhotoActions>
         <Likes>{likes === 1 ? "1 like" : `${likes} likes`}</Likes>
         <Comments
+          photoId={id}
           author={user.username}
           caption={caption}
           commentNumber={commentNumber}
