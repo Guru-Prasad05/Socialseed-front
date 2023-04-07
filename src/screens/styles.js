@@ -3,8 +3,8 @@ import reset from "styled-reset";
 reset;
 export const lightTheme = {
   accent: "#0095f6",
-  bgColor:"#fafafa",
-  fontColor:"rgb(38,38,38)",
+  bgColor: "#fafafa",
+  fontColor: "rgb(38,38,38)",
   borderColor: "rgb(219,219,219)",
 };
 
@@ -22,13 +22,14 @@ export const GlobalStyles = createGlobalStyle`
       box-sizing:border-box;
     }
     body{
-      background-color:${props=>props.theme.bgColor};
+      background-color:${(props) => props.theme.bgColor};
       font-size:14px;
       font-family:'Open Sans', sans-serif;
-      color:${props=>props.theme.fontColor};
+      color:${(props) => props.theme.fontColor};
     }
     a{
       text-decoration: none;
+      color:inherit;
     }
      
 `;

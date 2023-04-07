@@ -10,8 +10,8 @@ import Signup from "./screens/Signup";
 import routes from "./routes";
 import { HelmetProvider } from "react-helmet-async";
 import { ApolloProvider } from "@apollo/client";
-import Header from "./components/Header";
 import Layout from "./components/Layout";
+import Profile from "./screens/Profile";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -21,21 +21,32 @@ function App() {
       <HelmetProvider>
         <ThemeProvider theme={darkMode ? darkTheme : lightTheme}>
           <GlobalStyles />
-            <Router>
-              <Switch>
-                <Route path={routes.home} exact>
-                  {isLoggedIn ? <Layout><Home/></Layout> : <Login />}
+          <Router>
+            <Switch>
+              <Route path={routes.home} exact>
+                {isLoggedIn ? (
+                  <Layout>
+                    <Home />
+                  </Layout>
+                ) : (
+                  <Login />
+                )}
+              </Route>
+              {!isLoggedIn ? (
+                <Route path={routes.signUp}>
+                  <Signup />
                 </Route>
-                {!isLoggedIn ? (
-                  <Route path={routes.signUp}>
-                    <Signup />
-                  </Route>
-                ) : null}
-                <Route>
-                  <Notfound />
-                </Route>
-              </Switch>
-            </Router>
+              ) : null}
+              <Route path={`/users/:username`}>
+                <Layout>
+                  <Profile />
+                </Layout>
+              </Route>
+              <Route>
+                <Notfound />
+              </Route>
+            </Switch>
+          </Router>
         </ThemeProvider>
       </HelmetProvider>
     </ApolloProvider>
