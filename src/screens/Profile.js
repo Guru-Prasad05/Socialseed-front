@@ -1,6 +1,6 @@
 import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useParams } from "react-router-dom";
 import { PHOTO_FRAGMENT } from "../components/fragments.js";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,6 +9,7 @@ import { FatText } from "../components/shared.js";
 import Button from "../components/Auth/Button.js";
 import PageTitle from "../components/PageTitle.js";
 import useUser from "../hooks/useUser.js";
+import Post from "./Post.js";
 
 const FOLLOW_USER_MUTATION = gql`
   mutation followUser($username: String!) {
@@ -46,11 +47,15 @@ const SEE_PROFILE_QUERY = gql`
   ${PHOTO_FRAGMENT}
 `;
 
+
+
 const Header = styled.div`
   display: flex;
   align-items: center;
   margin-top: 20px;
 `;
+
+
 const Avatar = styled.img`
   margin-left: 50px;
   height: 160px;
@@ -67,6 +72,7 @@ const Username = styled.h3`
 
 const Row = styled.div`
   margin-bottom: 20px;
+  gap:3px;
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -129,9 +135,11 @@ const ProfileButton = styled(Button).attrs({
   margin-top: 0;
   margin-left: 15px;
   cursor: pointer;
+  padding: 10px 20px;
 `;
 
 export default function Profile() {
+  const [showModal, setShowModal]=useState(false)
   const { username } = useParams();
   const client = useApolloClient();
   const { data: userData } = useUser();
@@ -140,6 +148,7 @@ export default function Profile() {
       username,
     },
   });
+  
 
   const unfollowUserUpdate = (cache, result) => {
     const {
@@ -219,7 +228,12 @@ export default function Profile() {
   const getButton = (seeProfile) => {
     const { isMe, isFollowing } = seeProfile;
     if (isMe) {
-      return <ProfileButton>Edit Profile</ProfileButton>;
+      return (
+        <>
+          <ProfileButton>Edit</ProfileButton>
+          <ProfileButton onClick={()=>setShowModal(true)}>Post</ProfileButton>
+        </>
+      );
     }
     if (isFollowing) {
       return <ProfileButton onClick={unfollowUser}>Unfollow</ProfileButton>;
@@ -228,8 +242,13 @@ export default function Profile() {
     }
   };
 
+  const closeModal=()=>{
+    return setShowModal(false)
+  }
+
   return (
     <div>
+    {showModal ? <Post closeModal={closeModal} />:null}
       <PageTitle
         title={
           loading ? "Loading..." : `${data?.seeProfile?.username}'s Profile'`

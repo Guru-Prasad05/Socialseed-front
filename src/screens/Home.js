@@ -5,7 +5,7 @@ import Photo from "../components/Feed/Photo.js";
 import PageTitle from "../components/PageTitle.js";
 import { COMMENT_FRAGMENT, PHOTO_FRAGMENT } from "../components/fragments.js";
 
-const FEED_QUERY = gql`
+export const FEED_QUERY = gql`
   query seeFeed {
     seeFeed {
       ...PhotoFragment

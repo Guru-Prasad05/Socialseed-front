@@ -53,7 +53,7 @@ export default function Signup() {
     const { username, password } = getValues();
 
     const {
-      createAccount: { ok, error },
+      createAccount: { ok },
     } = data;
     if (!ok) {
       return;
