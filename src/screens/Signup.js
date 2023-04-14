@@ -59,7 +59,7 @@ export default function Signup() {
       return;
     }
     history.push(routes.home, {
-      message: "Account created successfully please Login!!!",
+      message: "ok",
       username,
       password,
     });

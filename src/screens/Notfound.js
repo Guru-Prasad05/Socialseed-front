@@ -1,9 +1,27 @@
 import React from 'react'
+import styled from 'styled-components'
+import BottomBox from '../components/Auth/BottomBox'
+import image from "../../public/socialseed_404.gif"
+
+
+const Container=styled.div``
+const HeadingTxt=styled.div``
+const Gif=styled.div`
+  background-image:url(image);
+`
+const Msg=styled.div``
+const Text=styled.p``
 
 export default function Notfound() {
   return (
-    <div>
-      <h1>404 Not Found</h1>
-    </div>
+    <Container>
+      <HeadingTxt>404</HeadingTxt>
+      <Gif/>
+      <Msg>
+        <Text>Look like you're lost</Text>
+        <Text>The page you are looking for not available</Text>
+      </Msg>
+      <BottomBox cta="xxx" link="/" linkText="Go to Home"/>
+    </Container>
   )
 }

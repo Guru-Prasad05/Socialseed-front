@@ -1,11 +1,14 @@
 import { gql, useQuery, useMutation, useApolloClient } from "@apollo/client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useParams } from "react-router-dom";
 import { PHOTO_FRAGMENT } from "../components/fragments.js";
 import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FatText } from "../components/shared.js";
+import { useLocation } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import Button from "../components/Auth/Button.js";
 import PageTitle from "../components/PageTitle.js";
 import useUser from "../hooks/useUser.js";
@@ -35,6 +38,7 @@ const SEE_PROFILE_QUERY = gql`
       username
       bio
       avatar
+      email
       photos {
         ...PhotoFragment
       }
@@ -47,14 +51,11 @@ const SEE_PROFILE_QUERY = gql`
   ${PHOTO_FRAGMENT}
 `;
 
-
-
 const Header = styled.div`
   display: flex;
   align-items: center;
   margin-top: 20px;
 `;
-
 
 const Avatar = styled.img`
   margin-left: 50px;
@@ -62,6 +63,9 @@ const Avatar = styled.img`
   width: 160px;
   border-radius: 50%;
   margin-right: 150px;
+  background-color: lightgray;
+  outline: 2px solid lightgray;
+  outline-offset: 5px;
 `;
 
 const Column = styled.div``;
@@ -72,7 +76,7 @@ const Username = styled.h3`
 
 const Row = styled.div`
   margin-bottom: 20px;
-  gap:3px;
+  gap: 3px;
   font-size: 16px;
   display: flex;
   align-items: center;
@@ -139,7 +143,9 @@ const ProfileButton = styled(Button).attrs({
 `;
 
 export default function Profile() {
-  const [showModal, setShowModal]=useState(false)
+  const location = useLocation();
+  const notify = () => toast.success("Successfully edited profile..!!");
+  const [showModal, setShowModal] = useState(false);
   const { username } = useParams();
   const client = useApolloClient();
   const { data: userData } = useUser();
@@ -148,7 +154,15 @@ export default function Profile() {
       username,
     },
   });
-  
+
+  useEffect(() => {
+    if (location?.state?.message === "ok") {
+      notify();
+    }
+    return () => {
+      location.state = "";
+    };
+  }, []);
 
   const unfollowUserUpdate = (cache, result) => {
     const {
@@ -227,11 +241,14 @@ export default function Profile() {
 
   const getButton = (seeProfile) => {
     const { isMe, isFollowing } = seeProfile;
+    console.log(isMe)
     if (isMe) {
       return (
         <>
-          <ProfileButton>Edit</ProfileButton>
-          <ProfileButton onClick={()=>setShowModal(true)}>Post</ProfileButton>
+          <ProfileButton>
+            <Link to={`/users/edit/${username}`}>Edit</Link>
+          </ProfileButton>
+          <ProfileButton onClick={() => setShowModal(true)}>Post</ProfileButton>
         </>
       );
     }
@@ -242,17 +259,28 @@ export default function Profile() {
     }
   };
 
-  const closeModal=()=>{
-    return setShowModal(false)
-  }
+  const closeModal = () => {
+    return setShowModal(false);
+  };
 
   return (
     <div>
-    {showModal ? <Post closeModal={closeModal} />:null}
+      {showModal ? <Post closeModal={closeModal} /> : null}
       <PageTitle
         title={
           loading ? "Loading..." : `${data?.seeProfile?.username}'s Profile'`
         }
+      />
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        pauseOnHover
+        theme="colored"
       />
       <Header>
         <Avatar src={data?.seeProfile?.avatar} />

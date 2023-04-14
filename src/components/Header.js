@@ -3,11 +3,11 @@ import styled from "styled-components";
 import { faCompass } from "@fortawesome/free-regular-svg-icons";
 import { faHome, faPowerOff} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { isLoggedInVar } from "../apollo";
+import { isLoggedInVar, logUserOut } from "../apollo";
 import { useReactiveVar } from "@apollo/client";
 import useUser from "../hooks/useUser";
 import Avatar from "./Avatar";
-import { Link } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 import routes from "../routes";
 
 const SHeader = styled.header`
@@ -37,10 +37,14 @@ const Icon = styled.span`
 const LogoutIcon = styled.span`
   margin-left:20px;
   svg{
-    color:tomato;
+    color:${props=>props.theme.borderColor};
     font-size: 20px;
     font-weight: 600;
     cursor: pointer;
+
+    &:hover{
+      color:${props=>props.theme.accent};
+    }
   }
 `;
 
@@ -58,7 +62,14 @@ const Button = styled.span`
 
 export default function Header() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
+  const history=useHistory()
   const { data } = useUser();
+
+  const logout=()=>{
+    history.push("/")
+   return logUserOut()
+  }
+  
   return (
     <SHeader>
       <Wrapper>
@@ -72,7 +83,9 @@ export default function Header() {
               </Link>
             </Icon>
             <Icon>
+              <Link to={"/seephotos"}>
               <FontAwesomeIcon icon={faCompass} size="lg" />
+              </Link>
             </Icon>
             <Icon>
               <Link to={`/users/${data?.me?.username}`}>
@@ -81,12 +94,12 @@ export default function Header() {
             </Icon>
           </IconContainer>
         ) : (
-          <Link href={routes.home}>
+          <Link to={routes.home}>
             <Button>Login</Button>
           </Link>
         )}
       </Wrapper>
-      {isLoggedIn ?<LogoutIcon title="Logout">
+      {isLoggedIn ?<LogoutIcon title="Logout" onClick={logout}>
         <FontAwesomeIcon icon={faPowerOff} />
       </LogoutIcon>:null}
     </SHeader>

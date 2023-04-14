@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { faFacebookSquare } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import styled from "styled-components";
@@ -15,6 +15,8 @@ import { gql, useMutation } from "@apollo/client";
 import { logUserIn } from "../apollo.js";
 import { useLocation } from "react-router-dom";
 import PageTitle from "../components/PageTitle.js";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -23,16 +25,16 @@ const FacebookLogin = styled.div`
     font-weight: 600;
   }
 `;
-const Notification = styled.div`
-  color: #ffffff;
-  background-color: #2ecc71;
-  text-align: center;
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.35);
-  margin-top: 10px;
-`;
+// const Notification = styled.div`
+//   color: #ffffff;
+//   background-color: #2ecc71;
+//   text-align: center;
+//   font-size: 16px;
+//   padding: 5px 10px;
+//   border-radius: 5px;
+//   box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.35);
+//   margin-top: 10px;
+// `;
 
 const LOGIN_MUTATION = gql`
   mutation login($username: String!, $password: String!) {
@@ -46,7 +48,9 @@ const LOGIN_MUTATION = gql`
 
 export default function Login() {
   const location = useLocation();
-  console.log(location);
+  const notify = () =>
+    toast.success("Account created successfully please Login!!!");
+
   const {
     register,
     handleSubmit,
@@ -89,18 +93,28 @@ export default function Login() {
   const clearLoginError = () => {
     clearErrors("result");
   };
+  useEffect(()=>{
+    if(location?.state?.message==="ok"){
+      notify()
+    }
+  },[])
   return (
     <AuthLayout>
       <PageTitle title={"Login"} />
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="colored"
+      />
       <FormBox>
         <div>LOGO</div>
-
-        {location?.state?.message ? (
-          <Notification>{location?.state?.message}</Notification>
-        ) : (
-          ""
-        )}
-
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <Input
             ref={register({

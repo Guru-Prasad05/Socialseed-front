@@ -3,11 +3,13 @@ import ReactDOM from "react-dom";
 import PageTitle from "../components/PageTitle";
 import Button from "../components/Auth/Button";
 import { useForm } from "react-hook-form";
-import { gql, useApolloClient, useMutation } from "@apollo/client";
-import { ApolloClient } from "@apollo/client/core";
+import { gql, useMutation } from "@apollo/client";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css"
 import styled from "styled-components";
 import useUser from "../hooks/useUser";
 import { FEED_QUERY } from "./Home";
+import { useHistory } from "react-router-dom";
 
 const UPLOAD_PHOTO_MUTATION = gql`
   mutation uploadPhoto($file: Upload!, $caption: String) {
@@ -122,14 +124,16 @@ const PreviewImg = styled.img`
 export default function Post({ closeModal }) {
   const [file, setFile] = useState();
   const { data: userData } = useUser();
+  const history=useHistory();
+  const notify = () => toast.success("Post created successfully!!");
 
-  const onCompleted = (cache, result) => {
+  const updatePost = (cache, result) => {
     const {
       data: {
         uploadPhoto: { id, file, caption },
       },
     } = result;
-    console.log(result);
+
     if (!id) {
       return;
     }
@@ -178,21 +182,20 @@ export default function Post({ closeModal }) {
         },
       },
     });
-    const seeFeedQuery=cache.readQuery({query:FEED_QUERY})
-    console.log(seeFeedQuery)
+    const seeFeedQuery = cache.readQuery({ query: FEED_QUERY });
+
     cache.writeQuery({
-      query:FEED_QUERY,
-      data:{seeFeed:[...seeFeedQuery.seeFeed,cachePhoto]}
-      
-    })
+      query: FEED_QUERY,
+      data: { seeFeed: [...seeFeedQuery.seeFeed, cachePhoto] },
+    });
+    history.push(`/`,{message:"ok"})
   };
 
-
-  const [uploadPhoto, { loading, data }] = useMutation(UPLOAD_PHOTO_MUTATION, {
-    update: onCompleted,
+  const [uploadPhoto, { loading }] = useMutation(UPLOAD_PHOTO_MUTATION, {
+    update: updatePost,
   });
 
-  const { register, handleSubmit, errors, formState, getValues } = useForm();
+  const { register, handleSubmit } = useForm();
   const onSubmitPost = (data) => {
     if (loading) {
       return;
@@ -205,14 +208,25 @@ export default function Post({ closeModal }) {
       },
     });
   };
-
   return ReactDOM.createPortal(
     <>
       <ModalBackdrop>
-        <CloseMod onClick={() => closeModal()}>X</CloseMod>
+        <CloseMod onClick={() => closeModal()} >X</CloseMod>
         <PageTitle title={"Post"} />
+        <ToastContainer
+            position="top-center"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            pauseOnHover
+            theme="colored"
+          />
 
         <FormContainer>
+          
           <CreatePost>Create Post</CreatePost>
           <FormElement onSubmit={handleSubmit(onSubmitPost)}>
             <div>
@@ -241,7 +255,7 @@ export default function Post({ closeModal }) {
                 placeholder="write your caption here...."
               />
 
-              <PostButton type="submit">Post</PostButton>
+              <PostButton type="submit" onClick={()=>notify()}>Post</PostButton>
             </Captioncontainer>
           </FormElement>
         </FormContainer>

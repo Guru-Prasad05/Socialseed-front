@@ -13,6 +13,9 @@ import { ApolloProvider } from "@apollo/client";
 import Layout from "./components/Layout";
 import Profile from "./screens/Profile";
 import Post from "./screens/Post";
+import { exact } from "prop-types";
+import Edit from "./screens/Edit";
+import Explore from "./screens/Explore";
 
 function App() {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
@@ -38,9 +41,23 @@ function App() {
                   <Signup />
                 </Route>
               ) : null}
-              <Route path={`/users/:username`} >
+              <Route path={`/users/:username`} exact>
                 <Layout>
                   <Profile />
+                </Layout>
+              </Route>
+              <Route path={`/users/edit/:username`} exact>
+                {isLoggedIn ? (
+                  <Layout>
+                    <Edit />
+                  </Layout>
+                ) : (
+                  <Login />
+                )}
+              </Route>
+              <Route path={"/seephotos"} exact>
+                <Layout>
+                  <Explore/>
                 </Layout>
               </Route>
               <Route>
