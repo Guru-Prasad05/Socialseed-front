@@ -203,6 +203,7 @@ export default function Edit() {
   }, [data]);
 
   const onSubmitValid = (data) => {
+    
     editProfile({
       variables: {
         firstName: data?.firstName,

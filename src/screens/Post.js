@@ -125,7 +125,7 @@ export default function Post({ closeModal }) {
   const [file, setFile] = useState();
   const { data: userData } = useUser();
   const history=useHistory();
-  const notify = () => toast.success("Post created successfully!!");
+  const notify = () => toast.error("Somthing Wrong. Please Try Again");
 
   const updatePost = (cache, result) => {
     const {
@@ -191,17 +191,17 @@ export default function Post({ closeModal }) {
     history.push(`/`,{message:"ok"})
   };
 
-  const [uploadPhoto, { loading }] = useMutation(UPLOAD_PHOTO_MUTATION, {
+  const [uploadPhoto, { loading, error:uploadError }] = useMutation(UPLOAD_PHOTO_MUTATION, {
     update: updatePost,
   });
 
   const { register, handleSubmit } = useForm();
-  const onSubmitPost = (data) => {
+  const onSubmitPost = async(data) => {
     if (loading) {
       return;
     }
-
-    uploadPhoto({
+    
+    await uploadPhoto({
       variables: {
         file: data.file[0],
         caption: data.caption,
@@ -255,7 +255,7 @@ export default function Post({ closeModal }) {
                 placeholder="write your caption here...."
               />
 
-              <PostButton type="submit" onClick={()=>notify()}>Post</PostButton>
+              <PostButton type="submit" onClick={()=>uploadError?notify():""}>Post</PostButton>
             </Captioncontainer>
           </FormElement>
         </FormContainer>

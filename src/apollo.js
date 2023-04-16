@@ -36,7 +36,7 @@ export const disableDarkMode = () => {
 //   uri: "http://localhost:4000/graphql",
 // });
 
-const uploadLink = createUploadLink({ uri: "https://socialseed.onrender.com/graphql" });
+const uploadLink = createUploadLink({ uri: "http://localhost:4000/graphql" });   //https://socialseed.onrender.com/graphql
 
 const authLink = setContext((_, { headers }) => {
   return {
