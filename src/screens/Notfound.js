@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import BottomBox from '../components/Auth/BottomBox'
-import image from "../../public/socialseed_404.gif"
+import image from "../resources/socialseed_404.gif"
 
 
 const Container=styled.div``
