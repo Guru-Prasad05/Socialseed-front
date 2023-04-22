@@ -133,7 +133,6 @@ const LoadContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 50%;
 `;
 
 export default function Post({ close }) {
