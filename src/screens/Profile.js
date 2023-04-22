@@ -355,7 +355,7 @@ export default function Profile() {
               name={username}
               isMe={data?.seeProfile?.isMe}
               isFollowing={data?.seeProfile?.isFollowing}
-              userId={data.id}
+              userId={data?.seeProfile?.id}
             />
           ) : null}
           <PageTitle
