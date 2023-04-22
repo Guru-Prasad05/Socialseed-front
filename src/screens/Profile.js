@@ -345,7 +345,7 @@ export default function Profile() {
               close={closeFollower}
               name={username}
               isMe={data?.seeProfile?.isMe}
-              userId={data.id}
+              userId={data?.seeProfile?.id}
               isFollowing={data?.seeProfile?.isFollowing}
             />
           ) : null}
