@@ -28,7 +28,7 @@ export const GlobalStyles = createGlobalStyle`
         background-color:${(props) => props.theme.bgColor}
       }
       ::-webkit-scrollbar-thumb{
-        background-color:${(props) => props.theme.accent}
+        background-color:${(props) => props.theme.borderColor}
       }
     }
     body{
