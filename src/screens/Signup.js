@@ -12,6 +12,7 @@ import { gql, useMutation } from "@apollo/client";
 import { FatLink } from "../components/shared.js";
 import { useHistory } from "react-router-dom";
 import PageTitle from "../components/PageTitle.js";
+import SocialSeed from "../components/Auth/SocialSeedLogo.js";
 
 const HeaderContainer = styled.div`
   display: flex;
@@ -22,7 +23,8 @@ const HeaderContainer = styled.div`
 const WrapperTitle = styled(FatLink)`
   font-size: 1rem;
   text-align: center;
-  margin-top: 10px;
+  margin-top: 12px;
+  font-size: 12px;
 `;
 
 const CREATE_ACCOUNT_MUTATION = gql`
@@ -44,7 +46,7 @@ const CREATE_ACCOUNT_MUTATION = gql`
       error
     }
   }
-`;
+`
 
 export default function Signup() {
   const history = useHistory();
@@ -87,7 +89,7 @@ export default function Signup() {
       <PageTitle title={"Signup"} />
       <FormBox>
         <HeaderContainer>
-          LOGO
+          <SocialSeed/>
           <WrapperTitle>
             Sign up to see photos and video from your friends.
           </WrapperTitle>

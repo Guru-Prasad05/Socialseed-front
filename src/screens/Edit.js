@@ -13,7 +13,8 @@ import { useForm } from "react-hook-form";
 import styled from "styled-components";
 import Button from "../components/Auth/Button";
 import { useHistory } from "react-router-dom";
-import PageTitle from "../components/PageTitle"
+import PageTitle from "../components/PageTitle";
+import { RotatingLines } from "react-loader-spinner";
 
 const EDIT_PROFILE_MUTATION = gql`
   mutation editProfile(
@@ -61,7 +62,7 @@ const Avatar = styled.img`
   border-radius: 50%;
   margin-right: 10px;
   background-color: lightgray;
-  outline: 2px solid lightgray;
+  outline: 2px solid ${(props) => props.theme.accent};
   outline-offset: 5px;
 `;
 
@@ -126,10 +127,20 @@ const SubBtn = styled(Button).attrs({
   padding: 10px 20px;
 `;
 
+const LoadContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`;
+
+const Form = styled.form`
+  color: rgb(38,38,38);
+`;
+
 export default function Edit() {
-    const history=useHistory()
+  const history = useHistory();
   const hasToken = useReactiveVar(isLoggedInVar);
-  const { data } = useQuery(ME_QUERY, {
+  const { data, loading: profileLoad } = useQuery(ME_QUERY, {
     skip: !hasToken,
   });
 
@@ -153,7 +164,7 @@ export default function Edit() {
         editProfile: { ok, avatar },
       },
     } = result;
-    
+
     if (!ok) {
       return;
     }
@@ -161,40 +172,37 @@ export default function Edit() {
     cache.modify({
       id: `User:${username}`,
       fields: {
-        firstName(){
-            return firstName
+        firstName() {
+          return firstName;
         },
-        lastName(){
-            return lastName
+        lastName() {
+          return lastName;
         },
-        username(){
-            return username
+        username() {
+          return username;
         },
-        email(){
-            return email
+        email() {
+          return email;
         },
-        bio(){
-            return bio
+        bio() {
+          return bio;
         },
-        avatar(){
-            return avatar? avatar:data?.me?.avatar
+        avatar() {
+          return avatar ? avatar : data?.me?.avatar;
         },
-        isMe(){
-          return true
+        isMe() {
+          return true;
         },
-        isFollowing(){
-          return false
-        }
+        isFollowing() {
+          return false;
+        },
       },
     });
-    history.push(`/users/${username}`,{message:"ok"})
+    history.push(`/users/${username}`, { message: "ok" });
   };
-  const [editProfile, { loading}] = useMutation(
-    EDIT_PROFILE_MUTATION,
-    {
-      update: onCompleted,
-    }
-  );
+  const [editProfile, { loading }] = useMutation(EDIT_PROFILE_MUTATION, {
+    update: onCompleted,
+  });
 
   useEffect(() => {
     if (data?.me === null) {
@@ -203,7 +211,6 @@ export default function Edit() {
   }, [data]);
 
   const onSubmitValid = (data) => {
-    
     editProfile({
       variables: {
         firstName: data?.firstName,
@@ -218,108 +225,122 @@ export default function Edit() {
 
   return (
     <>
-      <Htop>
-        <Avatar src={data?.me?.avatar} type="file" />
-        <Name>{`${data?.me?.username}'s profile`}</Name>
-      </Htop>
-      <PageTitle title="Edit"/>
-      <form onSubmit={handleSubmit(onSubmitValid)}>
-        <EditContainer>
-          <Row>
-            <Label htmlFor="firstName">FIRSTNAME :</Label>
-            <EditInput
-              ref={register({
-                required: "Firstname is required",
-              })}
-              name="firstName"
-              type="text"
-              placeholder="Firstname"
+      <div>
+        {profileLoad ? (
+          <LoadContainer>
+            <RotatingLines
+              strokeColor="grey"
+              strokeWidth="5"
+              animationDuration="0.75"
+              width="50"
+              visible={true}
             />
-          </Row>
-          <FormError message={errors?.firstName?.message} />
-          <Row>
-            <Label htmlFor="lastName">LASTNAME :</Label>
-            <EditInput
-              ref={register({})}
-              name="lastName"
-              type="text"
-              placeholder="Lastname"
-            />
-          </Row>
-          <FormError message={errors?.lastName?.message} />
-          <Row>
-            <Label htmlFor="email">EMAIL :</Label>
-            <EditInput
-              ref={register({
-                required: "Email is required",
-              })}
-              name="email"
-              type="text"
-              placeholder="Email"
-            />
-          </Row>
-          <FormError message={errors?.email?.message} />
-          <Row>
-            <Label htmlFor="username">USERNAME :</Label>
-            <EditInput
-              ref={register({
-                required: "Username is required",
-                minLength: {
-                  value: 4,
-                  message: "Username should be longer than 4 chars.",
-                },
-              })}
-              name="username"
-              type="text"
-              placeholder="Username"
-            />
-          </Row>
-          <Row>
-            <Label htmlFor="avatar">Avatar :</Label>
-            <EditInput
-              ref={register({ required: false })}
-              name="avatar"
-              type="file"
-              accept="jpg/png"
-            />
-          </Row>
+          </LoadContainer>
+        ) : (
+          <Htop>
+            <Avatar src={data?.me?.avatar} type="file" />
+            <Name>{`${data?.me?.username}'s profile`}</Name>
+          </Htop>
+        )}
+        <PageTitle title="Edit" />
+        <Form onSubmit={handleSubmit(onSubmitValid)}>
+          <EditContainer>
+            <Row>
+              <Label htmlFor="firstName">FIRSTNAME :</Label>
+              <EditInput
+                ref={register({
+                  required: "Firstname is required",
+                })}
+                name="firstName"
+                type="text"
+                placeholder="Firstname"
+              />
+            </Row>
+            <FormError message={errors?.firstName?.message} />
+            <Row>
+              <Label htmlFor="lastName">LASTNAME :</Label>
+              <EditInput
+                ref={register({})}
+                name="lastName"
+                type="text"
+                placeholder="Lastname"
+              />
+            </Row>
+            <FormError message={errors?.lastName?.message} />
+            <Row>
+              <Label htmlFor="email">EMAIL :</Label>
+              <EditInput
+                ref={register({
+                  required: "Email is required",
+                })}
+                name="email"
+                type="text"
+                placeholder="Email"
+              />
+            </Row>
+            <FormError message={errors?.email?.message} />
+            <Row>
+              <Label htmlFor="username">USERNAME :</Label>
+              <EditInput
+                ref={register({
+                  required: "Username is required",
+                  minLength: {
+                    value: 4,
+                    message: "Username should be longer than 4 chars.",
+                  },
+                })}
+                name="username"
+                type="text"
+                placeholder="Username"
+              />
+            </Row>
+            <Row>
+              <Label htmlFor="avatar">Avatar :</Label>
+              <EditInput
+                ref={register({ required: false })}
+                name="avatar"
+                type="file"
+                accept="jpg/png"
+              />
+            </Row>
 
-          <FormError message={errors?.username?.message} />
-          <Row>
-            <Label htmlFor="password">NEW PASSWORD :</Label>
-            <EditInput
-              ref={register({
-                required: false,
-              })}
-              name="password"
-              type="password"
-              placeholder="New password"
-            />
-          </Row>
-          <Row>
-            <Label htmlFor="Bio">BIO :</Label>
-            <TextBox
-              ref={register({
-                required: false,
-              })}
-              name="bio"
-              type="text"
-              placeholder="Bio"
-            />
-          </Row>
-          <FormError message={errors?.password?.message} />
-        </EditContainer>
-       <SubBtn
-          type="submit"
-          link={`/users/${username}`}
-          //   value={loading ? "Loading..." : "Submit"}
-          disabled={!formState.isValid} //||loading
-        >
-          SUBMIT
-        </SubBtn>
-    
-        <FormError message={errors?.result?.message} />
-      </form>
+            <FormError message={errors?.username?.message} />
+            <Row>
+              <Label htmlFor="password">NEW PASSWORD :</Label>
+              <EditInput
+                ref={register({
+                  required: false,
+                })}
+                name="password"
+                type="password"
+                placeholder="New password"
+              />
+            </Row>
+            <Row>
+              <Label htmlFor="Bio">BIO :</Label>
+              <TextBox
+                ref={register({
+                  required: false,
+                })}
+                name="bio"
+                type="text"
+                placeholder="Bio"
+              />
+            </Row>
+            <FormError message={errors?.password?.message} />
+          </EditContainer>
+          <SubBtn
+            type="submit"
+            link={`/users/${username}`}
+            value={loading ? "Loading..." : "Submit"}
+            disabled={!formState.isValid} //||loading
+          >
+            SUBMIT
+          </SubBtn>
+
+          <FormError message={errors?.result?.message} />
+        </Form>
+      </div>
     </>
   );
 }

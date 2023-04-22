@@ -1,7 +1,6 @@
 import {
   ApolloClient,
   InMemoryCache,
-  createHttpLink,
   makeVar,
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
@@ -9,7 +8,8 @@ import { createUploadLink } from "apollo-upload-client";
 const TOKEN = "token";
 const DARK_MODE = "DARK_MODE";
 
-export const isLoggedInVar = makeVar(Boolean(localStorage.getItem(TOKEN)));
+export const 
+isLoggedInVar = makeVar(Boolean(localStorage.getItem(TOKEN)));
 
 export const logUserIn = (token) => {
   localStorage.setItem(TOKEN, token);
@@ -36,7 +36,7 @@ export const disableDarkMode = () => {
 //   uri: "http://localhost:4000/graphql",
 // });
 
-const uploadLink = createUploadLink({ uri: "https://socialseed.onrender.com/graphql" });   //https://socialseed.onrender.com/graphql
+const uploadLink = createUploadLink({ uri: "http://localhost:4000/graphql" });   //https://socialseed.onrender.com/graphql
 
 const authLink = setContext((_, { headers }) => {
   return {

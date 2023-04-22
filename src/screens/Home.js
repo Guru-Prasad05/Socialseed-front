@@ -1,5 +1,4 @@
 import React from "react";
-import { logUserOut } from "../apollo.js";
 import { gql, useQuery } from "@apollo/client";
 import Photo from "../components/Feed/Photo.js";
 import PageTitle from "../components/PageTitle.js";
@@ -26,7 +25,9 @@ export const FEED_QUERY = gql`
 `;
 
 export default function Home() {
-  const { data } = useQuery(FEED_QUERY);
+  const { data } = useQuery(FEED_QUERY,{
+    fetchPolicy:"cache-and-network"
+  });
   return (
     <div>
       <PageTitle title={"Home"} />

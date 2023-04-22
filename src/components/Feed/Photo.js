@@ -16,7 +16,7 @@ import Comments from "./Comments";
 import { Link } from "react-router-dom";
 
 const PhotoContainer = styled.div`
-  background-color: #ffffff;
+  background-color: ${(props) => props.theme.bgColor};
   border-radius: 4px;
   border: 1px solid ${(props) => props.theme.borderColor};
   margin-bottom: 60px;
@@ -27,7 +27,7 @@ const PhotoHeader = styled.div`
   padding: 15px;
   display: flex;
   align-items: center;
-  border-bottom: 1px solid rgb(239, 239, 239);
+  border-bottom: 1px solid  ${(props) => props.theme.borderColor};
 `;
 
 const Username = styled(FatText)`

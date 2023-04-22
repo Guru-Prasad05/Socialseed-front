@@ -1,26 +1,24 @@
-import { gql, useQuery } from '@apollo/client';
-import React from 'react'
-import styled from 'styled-components'
+import { gql, useQuery } from "@apollo/client";
+import React from "react";
+import styled from "styled-components";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faComment, faHeart } from "@fortawesome/free-regular-svg-icons";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
 
-const SEE_ALL_PHOTOS_QUERY=gql`
-    query compass($lastId:Int){
-        compass(lastId:$lastId){
-          id
-          file
-          user{
-            username
-          }
-          likes
-          commentNumber
-
-        }
+const SEE_ALL_PHOTOS_QUERY = gql`
+  query compass($lastId: Int) {
+    compass(lastId: $lastId) {
+      id
+      file
+      user {
+        username
+      }
+      likes
+      commentNumber
     }
-
-`
-
+  }
+`;
 
 const Grid = styled.div`
   display: grid;
@@ -34,7 +32,7 @@ const Photo = styled.div`
   background-image: url(${(props) => props.bg});
   background-size: cover;
   position: relative;
-  cursor:pointer;
+  cursor: pointer;
 `;
 
 const Icons = styled.div`
@@ -62,31 +60,52 @@ const Icon = styled.span`
     margin-right: 5px;
   }
 `;
+const LoadContainer=styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
 
-const ExploreContainer=styled.div``
+const ExploreContainer = styled.div``;
 
 export default function Explore() {
-  const {data,loading}=useQuery(SEE_ALL_PHOTOS_QUERY)
-  const history=useHistory()
-  
+  const { data, loading } = useQuery(SEE_ALL_PHOTOS_QUERY);
+  const history = useHistory();
+
   return (
     <ExploreContainer>
-      <Grid>
-        {data?.compass.map((photo) => (
-          <Photo bg={photo.file} key={photo.id} onClick={()=>history.push(`/users/${photo.user.username}`)}>
-            <Icons>
-              <Icon>
-                <FontAwesomeIcon icon={faHeart} />
-                {photo.likes}
-              </Icon>
-              <Icon>
-                <FontAwesomeIcon icon={faComment} />
-                {photo.commentNumber}
-              </Icon>
-            </Icons>
-          </Photo>
-        ))}
-      </Grid>
+      {loading ? (
+        <LoadContainer>
+          <RotatingLines
+            strokeColor="grey"
+            strokeWidth="5"
+            animationDuration="0.75"
+            width="50"
+            visible={true}
+          />
+        </LoadContainer>
+      ) : (
+        <Grid>
+          {data?.compass.map((photo) => (
+            <Photo
+              bg={photo.file}
+              key={photo.id}
+              onClick={() => history.push(`/users/${photo.user.username}`)}
+            >
+              <Icons>
+                <Icon>
+                  <FontAwesomeIcon icon={faHeart} />
+                  {photo.likes}
+                </Icon>
+                <Icon>
+                  <FontAwesomeIcon icon={faComment} />
+                  {photo.commentNumber}
+                </Icon>
+              </Icons>
+            </Photo>
+          ))}
+        </Grid>
+      )}
     </ExploreContainer>
-  )
+  );
 }

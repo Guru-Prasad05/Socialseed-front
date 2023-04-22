@@ -17,6 +17,7 @@ import { useLocation } from "react-router-dom";
 import PageTitle from "../components/PageTitle.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import SocialSeed from "../components/Auth/SocialSeedLogo.js";
 
 const FacebookLogin = styled.div`
   color: #385285;
@@ -114,7 +115,7 @@ export default function Login() {
         theme="colored"
       />
       <FormBox>
-        <div>LOGO</div>
+        <SocialSeed/>
         <form onSubmit={handleSubmit(onSubmitValid)}>
           <Input
             ref={register({

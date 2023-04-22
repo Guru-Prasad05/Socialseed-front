@@ -5,11 +5,14 @@ import Button from "../components/Auth/Button";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css"
+import "react-toastify/dist/ReactToastify.css";
 import styled from "styled-components";
 import useUser from "../hooks/useUser";
 import { FEED_QUERY } from "./Home";
 import { useHistory } from "react-router-dom";
+import { RotatingLines } from "react-loader-spinner";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImage } from "@fortawesome/free-solid-svg-icons";
 
 const UPLOAD_PHOTO_MUTATION = gql`
   mutation uploadPhoto($file: Upload!, $caption: String) {
@@ -42,7 +45,8 @@ const FormContainer = styled.div`
 `;
 
 const CreatePost = styled.div`
-  background-color: #ffffff;
+  background-color: ${(props) => props.theme.bgColor};
+  color: ${(props) => props.theme.accent};
   text-align: center;
   border-bottom: 2px solid ${(props) => props.theme.borderColor};
   border-radius: 20px 20px 0 0;
@@ -68,13 +72,17 @@ const PhotoContainer = styled.div`
   span {
     position: absolute;
     text-align: center;
-    color: #fff;
-    border: 1px double #fff;
     border-radius: 15px;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     padding: 15px 20px;
+
+    svg {
+      font-size:80px;
+      border: none;
+      color: ${(props) => props.theme.accent};
+    }
   }
 `;
 const Captioncontainer = styled.div`
@@ -121,10 +129,17 @@ const PreviewImg = styled.img`
   border-radius: 0 0 10px 0;
 `;
 
-export default function Post({ closeModal }) {
+const LoadContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50%;
+`;
+
+export default function Post({ close }) {
   const [file, setFile] = useState();
   const { data: userData } = useUser();
-  const history=useHistory();
+  const history = useHistory();
   const notify = () => toast.error("Somthing Wrong. Please Try Again");
 
   const updatePost = (cache, result) => {
@@ -188,19 +203,22 @@ export default function Post({ closeModal }) {
       query: FEED_QUERY,
       data: { seeFeed: [...seeFeedQuery.seeFeed, cachePhoto] },
     });
-    history.push(`/`,{message:"ok"})
+    history.push(`/`, { message: "ok" });
   };
 
-  const [uploadPhoto, { loading, error:uploadError }] = useMutation(UPLOAD_PHOTO_MUTATION, {
-    update: updatePost,
-  });
+  const [uploadPhoto, { loading, error: uploadError }] = useMutation(
+    UPLOAD_PHOTO_MUTATION,
+    {
+      update: updatePost,
+    }
+  );
 
   const { register, handleSubmit } = useForm();
-  const onSubmitPost = async(data) => {
+  const onSubmitPost = async (data) => {
     if (loading) {
       return;
     }
-    
+
     await uploadPhoto({
       variables: {
         file: data.file[0],
@@ -211,53 +229,71 @@ export default function Post({ closeModal }) {
   return ReactDOM.createPortal(
     <>
       <ModalBackdrop>
-        <CloseMod onClick={() => closeModal()} >X</CloseMod>
+        <CloseMod onClick={() => close()}>X</CloseMod>
         <PageTitle title={"Post"} />
         <ToastContainer
-            position="top-center"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            pauseOnHover
-            theme="colored"
-          />
+          position="top-center"
+          autoClose={5000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          pauseOnHover
+          theme="colored"
+        />
 
         <FormContainer>
-          
           <CreatePost>Create Post</CreatePost>
-          <FormElement onSubmit={handleSubmit(onSubmitPost)}>
-            <div>
-              <PhotoContainer>
-                {file ? (
-                  <PreviewImg src={file} width="100%" height="100%" />
-                ) : (
-                  <span>Upload photo here...</span>
-                )}
-              </PhotoContainer>
-              <input
-                ref={register({ required: true })}
-                type="file"
-                accept="jpg/png"
-                name="file"
-                onChange={(e) =>
-                  setFile(URL.createObjectURL(e.target.files[0]))
-                }
+          {loading ? (
+            <LoadContainer>
+              <RotatingLines
+                strokeColor="grey"
+                strokeWidth="5"
+                animationDuration="0.75"
+                width="30"
+                visible={true}
               />
-            </div>
-            <Captioncontainer>
-              <CapInput
-                ref={register({ required: true })}
-                type="text"
-                name="caption"
-                placeholder="write your caption here...."
-              />
+            </LoadContainer>
+          ) : (
+            <FormElement onSubmit={handleSubmit(onSubmitPost)}>
+              <div>
+                <PhotoContainer>
+                  {file ? (
+                    <PreviewImg src={file} width="100%" height="100%" />
+                  ) : (
+                    <span>
+                      <FontAwesomeIcon icon={faImage} />
+                    </span>
+                  )}
+                </PhotoContainer>
+                <input
+                  ref={register({ required: true })}
+                  type="file"
+                  accept="jpg/png"
+                  name="file"
+                  onChange={(e) =>
+                    setFile(URL.createObjectURL(e.target.files[0]))
+                  }
+                />
+              </div>
+              <Captioncontainer>
+                <CapInput
+                  ref={register({ required: true })}
+                  type="text"
+                  name="caption"
+                  placeholder="write your caption here...."
+                />
 
-              <PostButton type="submit" onClick={()=>uploadError?notify():""}>Post</PostButton>
-            </Captioncontainer>
-          </FormElement>
+                <PostButton
+                  type="submit"
+                  onClick={() => (uploadError ? notify() : "")}
+                >
+                  Post
+                </PostButton>
+              </Captioncontainer>
+            </FormElement>
+          )}
         </FormContainer>
       </ModalBackdrop>
     </>,

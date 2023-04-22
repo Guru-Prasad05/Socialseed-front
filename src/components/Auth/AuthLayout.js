@@ -15,12 +15,13 @@ const Container = styled.div`
 `;
 
 const Footer = styled.footer`
-  margin-top: 500px;
+  margin-top: 570px;
   position:absolute;
 `;
 
 const DarkModeBtn = styled.span`
   cursor: pointer;
+  color: ${props=>props.theme.accent};
 `;
 
 const Wrapper = styled.div`

@@ -16,6 +16,7 @@ const Container = styled(BaseBox)`
     justify-items: center;
     flex-direction: column;
     align-items: center;
+    color: rgb(38,38,38);
   }
 `;
 

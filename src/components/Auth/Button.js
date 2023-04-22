@@ -12,6 +12,11 @@ const Button = styled.input`
   font-weight: 600;
   width: 100%;
   opacity: ${(props) => (props.disabled ? "0.3" : "1")};
+  cursor: pointer;
+  transition: background-color .5s;
+  &:hover{
+    background-color:${props=>props.theme.hover}
+  }
 `;
 
 export default Button;

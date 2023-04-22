@@ -6,18 +6,18 @@ import Comment from "./Comment";
 import { useForm } from "react-hook-form";
 import { gql, useMutation } from "@apollo/client";
 import useUser from "../../hooks/useUser";
+import { RotatingLines } from "react-loader-spinner";
 
 const CREATE_COMMENT_MUTATION = gql`
-  mutation createComment($photoId:Int!,$payload:String!){
-    createComment(photoId:$photoId,payload:$payload){
+  mutation createComment($photoId: Int!, $payload: String!) {
+    createComment(photoId: $photoId, payload: $payload) {
       ok
       id
       error
+      createAt
     }
   }
 `;
-
-
 
 const PostCommentContainer = styled.div`
   margin-top: 10px;
@@ -51,13 +51,14 @@ function Comments({ author, caption, commentNumber, comments, photoId }) {
   const { register, handleSubmit, setValue, getValues } = useForm();
 
   const createCommentUpdate = (cache, result) => {
-    
     const { payload } = getValues();
     setValue("payload", "");
     const {
-      data: { createComment:{ok,id} }
+      data: {
+        createComment: { ok, id },
+      },
     } = result;
-    
+
     if (ok && userData?.me) {
       const newComment = {
         __typename: "Comment",
@@ -84,7 +85,7 @@ function Comments({ author, caption, commentNumber, comments, photoId }) {
           }
         `,
       });
-     
+
       cache.modify({
         id: `Photo:${photoId}`,
         fields: {
@@ -99,12 +100,11 @@ function Comments({ author, caption, commentNumber, comments, photoId }) {
     }
   };
 
-  const [createCommentMutation, { loading }] = useMutation(
-    CREATE_COMMENT_MUTATION,
-    {
+  const [createCommentMutation, { data: commentResponse, loading }] =
+    useMutation(CREATE_COMMENT_MUTATION, {
       update: createCommentUpdate,
-    }
-  );
+    });
+
   const onValid = (data) => {
     const { payload } = data;
     if (loading) {
@@ -117,22 +117,37 @@ function Comments({ author, caption, commentNumber, comments, photoId }) {
       },
     });
   };
+
+
   return (
     <CommentsContainer>
       <Comment author={author} payload={caption} />
-      <CommentCount>
-        {commentNumber === 1 ? "1 comment" : `${commentNumber} comments`}
-      </CommentCount>
-      {comments?.map((comment) => (
-        <Comment
-          key={comment.id}
-          id={comment.id}
-          photoId={photoId}
-          author={comment.user.username}
-          payload={comment.payload}
-          isMine={comment.isMine}
+      {loading ? (
+        <RotatingLines
+          strokeColor="grey"
+          strokeWidth="5"
+          animationDuration="0.75"
+          width="30"
+          visible={true}
         />
-      ))}
+      ) : (
+        <>
+          <CommentCount>
+            {commentNumber === 1 ? "1 comment" : `${commentNumber} comments`}
+          </CommentCount>
+
+          {comments?.map((comment) => (
+            <Comment
+              key={comment.id}
+              id={comment.id}
+              photoId={photoId}
+              author={comment.user.username}
+              payload={comment.payload}
+              isMine={comment.isMine}
+            />
+          ))}
+        </>
+      )}
       <PostCommentContainer>
         <form onSubmit={handleSubmit(onValid)}>
           <PostCommentInput
