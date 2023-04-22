@@ -35,7 +35,7 @@ const ModalBackdrop = styled.div`
 `;
 
 const FormContainer = styled.div`
-  background-color: #ffffff;
+  background-color: ${props=>props.theme.borderColor};
   z-index: 20;
   border-radius: 20px;
   max-width: 700px;
